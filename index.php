@@ -75,7 +75,6 @@ $result = getPartsFromFullname($fullname);
 // выведем результат
 print_r($result);
 
-
 // ФУНКЦИЯ СБОРА ФИО ИЗ ЧАСТЕЙ
 function getFullnameFromParts($surname, $name, $patronomyc) {
 	return $surname.' '.$name.' '.$patronomyc;
@@ -86,8 +85,7 @@ $name = $result['name'];
 $patronomyc = $result['patronomyc'];
 // добавим полученные аргументы в функцию и напечатаем результат - строку
 $string = getFullnameFromParts($surname, $name, $patronomyc);
-echo "<p>{$string}</p>";
-
+print_r($string."\n");
 
 // ФУНКЦИЯ УКОРАЧИВАНИЯ ИМЕНИ
 // как аргумент строка с полными ФИО
@@ -100,9 +98,7 @@ function getShortName($string) {
 	return $short_name .' '. $short_surname .'.';
 }
 // добавим аргументы в функцию и выведем результат Имя Ф. без отчества
-$getShortName = 'getShortName';
-echo "<p>{$getShortName($string)}</p>";
-
+print_r(getShortName($string)."\n");
 
 // ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ПОЛА ПО ИМЕНИ
 //аргумент произвольная строка из исходного массива, полученная функцией getRandomFullname
@@ -138,12 +134,17 @@ function getGenderFromName($string) {
 	} else {
 		$gender .= 'не определен';	
 	}
+
 	return $gender;
 }
 // выведем результат определения пола
-$getGenderFromName = 'getGenderFromName';
-echo "<p>{$getGenderFromName($string)}</p>";
+print_r(getGenderFromName($string)."\n\r");
 
+// создадим функцию для подсчеита длины полученных массивов и исходного массива и посчитаем процентное соотношение
+function percent_count($gender_array, $arr) {
+	$percent = round((count($gender_array)/count($arr))*100, 1).'%';
+	return $percent;
+}
 
 // ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ПОЛОВОГО СОСТАВА
 function getGenderDescription($arr) {
@@ -165,34 +166,41 @@ function getGenderDescription($arr) {
 		return $value;
 	}
 	});
-// подсчитаем длины полученных массивов и исходного массива и посчитаем процентное соотношение
-	function percent_count($gender_array, $arr) {
-		$percent = round((count($gender_array)/count($arr))*100, 1).'%';
-		return $percent;
-	}
 	$men_percent = percent_count($men_array, $arr); 
 	$women_percent = percent_count($women_array, $arr);
 	$noGender_percent = percent_count($noGender_array, $arr);
 // подставим значения в текст
-echo "<p>
-Гендерный состав аудитории:<br>
--------------------------------------<br>
-Мужчины - {$men_percent}<br>
-Женщины - {$women_percent}<br>
-Не удалось определить - {$noGender_percent}</p>";
+echo <<<HEREDOCLETTER
+Гендерный состав аудитории:
+---------------------------
+Мужчины - $men_percent
+Женщины - $women_percent
+Не удалось определить - $noGender_percent
+HEREDOCLETTER;
 }
 // выведем результат
-print_r(getGenderDescription($example_persons_array));
+print_r(getGenderDescription($example_persons_array)."\n\r");
+
+
+// создадим функцию, которая приводит ввод ФИО к нужному нам регистру, используем в функции getPerfectPartner
+function rightCase($word) {
+	$word = mb_convert_case($word, MB_CASE_TITLE_SIMPLE);
+	return $word;
+}
+
+// создадим функцию подсчета рандомных процентов идеальности, используем в функции getPerfectPartner
+function getPerfectPercent() {
+	$max_percent = 100;
+	$current_percent = rand(50, 100).'.'.rand(0, 9).rand(0, 9);
+	if ($current_percent > $max_percent)
+	return $max_percent.'.'.'00';
+	else return $current_percent;
+}
 
 
 // ПОДБОР ИДЕАЛЬНОЙ ПАРЫ
 // аргументы: фамилия, имя, отчество отдельными строками (объявлены выше) и исходный массив $example_persons_array
 function getPerfectPartner($surname, $name, $patronomyc, $arr) {
-// создадим функцию, которая приводит ввод ФИО к нужному нам регистру
-	function rightCase($word) {
-		$word = mb_convert_case($word, MB_CASE_TITLE_SIMPLE);
-		return $word;
-	}
 // преобразуем некорректный ввод ФИО
 	$first_partner_surname = rightCase($surname);
 	$first_partner_name = rightCase($name);
@@ -201,34 +209,31 @@ function getPerfectPartner($surname, $name, $patronomyc, $arr) {
 	$first_partner_fullname = getFullnameFromParts($first_partner_surname, $first_partner_name, $first_partner_patronomyc);
 // определим пол первого партнера по имени
 	$first_partner_gender = getGenderFromName($first_partner_fullname);
+// исключим из вывода ФИО чей пол не определен
+	while ($first_partner_gender === 'Пол: не определен'){
+	$first_partner_fullname = getRandomFullname($arr);
+	$first_partner_gender = getGenderFromName($first_partner_fullname);
+	}
 // выберем произвольно человека с противоположным полом из исходного массива 
-	function getSecondPartner($arr, $gender) {
-		$second_partner_name = getRandomFullname($arr);
-		$second_partner_gender = getGenderFromName($second_partner_name);
+	$second_partner_name = getRandomFullname($arr);
+	$second_partner_gender = getGenderFromName($second_partner_name);
 // если пол такой же как у первого партнера или не определен, то продолжаем выбирать
-		while ($second_partner_gender === $gender || $second_partner_gender === 'Пол: не определен') {
-		$second_partner_name = getRandomFullname($arr);
-		$second_partner_gender = getGenderFromName($second_partner_name);
-		}
-		return $second_partner_name;
+	while ($second_partner_gender === $first_partner_gender || $second_partner_gender === 'Пол: не определен') {
+	$second_partner_name = getRandomFullname($arr);
+	$second_partner_gender = getGenderFromName($second_partner_name);
 	}
 // получим имя вторго партнера и поправим регистр имени, на всякий случай
-	$second_partner_fullname = rightCase(getSecondPartner($arr, $first_partner_gender));
+	$second_partner_fullname = rightCase($second_partner_name);
 // укоротим имена партнеров до вида Имя Ф.
 	$first_partner_short_name = getShortName($first_partner_fullname);
 	$second_partner_short_name = getShortName($second_partner_fullname);
 // вычислим произвольный процент идеальности от 50 до 100 с двумя знаками после запятой
-	function getPerfectPercent() {
-		$max_percent = 100;
-		$current_percent = rand(50, 100).'.'.rand(0, 9).rand(0, 9);
-		if ($current_percent > $max_percent)
-		return $max_percent.'.'.'00';
-		else return $current_percent;
-	}
 	$perfect_percent = getPerfectPercent().'%';
 // подставим полученные данные в текст
-echo "<p>{$first_partner_short_name} + {$second_partner_short_name} = <br>
-♡ Идеально на {$perfect_percent} ♡</p>";
+echo <<<HEREDOCLETTER
+$first_partner_short_name + $second_partner_short_name = 
+♡ Идеально на $perfect_percent ♡
+HEREDOCLETTER;
 }
 // выведем результат
 print_r(getPerfectPartner($surname, $name, $patronomyc, $example_persons_array)."\n");
