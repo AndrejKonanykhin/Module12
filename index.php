@@ -85,7 +85,7 @@ $name = $result['name'];
 $patronomyc = $result['patronomyc'];
 // добавим полученные аргументы в функцию и напечатаем результат - строку
 $string = getFullnameFromParts($surname, $name, $patronomyc);
-print_r($string."\n");
+echo "<p>{$string}</p>";
 
 // ФУНКЦИЯ УКОРАЧИВАНИЯ ИМЕНИ
 // как аргумент строка с полными ФИО
