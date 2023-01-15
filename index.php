@@ -98,7 +98,8 @@ function getShortName($string) {
 	return $short_name .' '. $short_surname .'.';
 }
 // добавим аргументы в функцию и выведем результат Имя Ф. без отчества
-print_r(getShortName($string)."\n");
+$getShortName = 'getShortName';
+echo "<p>{$getShortName($string)}</p>";
 
 // ФУНКЦИЯ ОПРЕДЕЛЕНИЯ ПОЛА ПО ИМЕНИ
 //аргумент произвольная строка из исходного массива, полученная функцией getRandomFullname
@@ -138,7 +139,8 @@ function getGenderFromName($string) {
 	return $gender;
 }
 // выведем результат определения пола
-print_r(getGenderFromName($string)."\n\r");
+$getGenderFromName = 'getGenderFromName';
+echo "<p>{$getGenderFromName($string)}</p>";
 
 // создадим функцию для подсчеита длины полученных массивов и исходного массива и посчитаем процентное соотношение
 function percent_count($gender_array, $arr) {
@@ -170,16 +172,15 @@ function getGenderDescription($arr) {
 	$women_percent = percent_count($women_array, $arr);
 	$noGender_percent = percent_count($noGender_array, $arr);
 // подставим значения в текст
-echo <<<HEREDOCLETTER
-Гендерный состав аудитории:
----------------------------
-Мужчины - $men_percent
-Женщины - $women_percent
-Не удалось определить - $noGender_percent
-HEREDOCLETTER;
+echo "<p>
+Гендерный состав аудитории:<br>
+-------------------------------------<br>
+Мужчины - {$men_percent}<br>
+Женщины - {$women_percent}<br>
+Не удалось определить - {$noGender_percent}</p>";
 }
 // выведем результат
-print_r(getGenderDescription($example_persons_array)."\n\r");
+print_r(getGenderDescription($example_persons_array));
 
 
 // создадим функцию, которая приводит ввод ФИО к нужному нам регистру, используем в функции getPerfectPartner
@@ -230,10 +231,9 @@ function getPerfectPartner($surname, $name, $patronomyc, $arr) {
 // вычислим произвольный процент идеальности от 50 до 100 с двумя знаками после запятой
 	$perfect_percent = getPerfectPercent().'%';
 // подставим полученные данные в текст
-echo <<<HEREDOCLETTER
-$first_partner_short_name + $second_partner_short_name = 
-♡ Идеально на $perfect_percent ♡
-HEREDOCLETTER;
+// подставим полученные данные в текст
+echo "<p>{$first_partner_short_name} + {$second_partner_short_name} = <br>
+♡ Идеально на {$perfect_percent} ♡</p>";
 }
 // выведем результат
 print_r(getPerfectPartner($surname, $name, $patronomyc, $example_persons_array)."\n");
